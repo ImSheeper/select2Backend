@@ -37,23 +37,38 @@ try {
   const [[{total}]] = await pool.query(sqlGetRowsCount, paramsGetRowsCount); 
 
   // Testy parametrow
+  let stringParameters = [];
   const queryParameters = req.query.queryParameters;
   console.log(req.query.queryParameters);
-
   if (queryParameters) {
-    stringParameters = [queryParameters, limit, offset];
+    for (let queryParameter of queryParameters) {
+      stringParameters.push(queryParameter);
+    }
+  }
+
+  console.log('term', term);
+  if (term) {
+    console.log('IFTER');
+    stringParameters.push(`%${term}%`)
+  }
+
+  // Poprawienie SQL i dodanie parametrow do zapytania
+  if (Array.isArray(queryParameters) && queryParameters.length) {
+    stringParameters.push(limit, offset) ;
     where = term ? 'AND nazwa LIKE ?' : '';
   } else {
-    stringParameters = [limit, offset];
+    stringParameters.push(limit, offset);
   }
 
   // Pobierz dane z DB
   const sqlGetItems = `${query} ${where} LIMIT ? OFFSET ?`;
-  const paramsGetItems = term 
-    ? [queryParameters, `%${term}%`, limit, offset] 
-    : stringParameters;
+  const paramsGetItems = stringParameters;
+
+  console.log(`Query: ${sqlGetItems}`);
+  console.log(`Params: ${paramsGetItems}`);
 
   const [results] = await pool.query(sqlGetItems, paramsGetItems);
+  console.log(results);
 
   const isMorePages = offset + results.length < total;
 

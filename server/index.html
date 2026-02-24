@@ -31,7 +31,7 @@
     console.log(selectId.id);
 
     const czyAktywny = 1;
-    // const typKosztu = 'Produkt 50';
+    const typKosztu = 'Dioda LED czerwona';
 
     $('.mySelect').select2( {
         ajax: {
@@ -44,7 +44,7 @@
                     term: params.term || '',
                     page: params.page || 1,
                     limit: 10,
-                    // queryParameters: [czyAktywny, typKosztu]
+                    // queryParameters: [czyAktywny]
                 }
 
                 return query;
@@ -76,7 +76,7 @@
                     term: params.term || '',
                     page: params.page || 1,
                     limit: 10,
-                    queryParameters: [czyAktywny]
+                    queryParameters: [czyAktywny, typKosztu]
                 }
 
                 return query;
