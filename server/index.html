@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista z API</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+
+<h1>Wybierz element</h1>
+
+<select class="mySelect" id="TypKosztu" style="width:300px">
+    <option value="">-Typ</option>
+</select>
+
+<select class="mySelect2" id="UsersActive" style="width:300px">
+    <option value="">-Users</option>
+</select>
+
+<script>
+    const selectId = document.getElementById('TypKosztu');
+    console.log(selectId.id);
+
+    const czyAktywny = 1;
+    // const typKosztu = 'Produkt 50';
+
+    $('.mySelect').select2( {
+        ajax: {
+            url: 'http://localhost:3000/api/query/' + selectId.id,
+            dataType: 'json',
+            delay: 250,
+            traditional: true,
+            data: function (params) {
+                var query = {
+                    term: params.term || '',
+                    page: params.page || 1,
+                    limit: 10,
+                    // queryParameters: [czyAktywny, typKosztu]
+                }
+
+                return query;
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return data;
+            },
+            error: function (err) {
+                const message = err.responseJSON.error;
+
+                alert(message);
+            }
+        }
+    });
+
+    // Testy
+    const selectId2 = document.getElementById('UsersActive');
+    console.log(selectId.id);
+
+    $('.mySelect2').select2( {
+        ajax: {
+            url: 'http://localhost:3000/api/query/' + selectId2.id,
+            dataType: 'json',
+            delay: 250,
+            traditional: true,
+            data: function (params) {
+                var query = {
+                    term: params.term || '',
+                    page: params.page || 1,
+                    limit: 10,
+                    queryParameters: [czyAktywny]
+                }
+
+                return query;
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return data;
+            },
+            error: function (err) {
+                const message = err.responseJSON.error;
+
+                alert(message);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

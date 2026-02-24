@@ -1,0 +1,7 @@
+{
+  "queries": {
+    "TypKosztu": { "sql": "SELECT id, nazwa as text FROM items", "sqlCount": "SELECT COUNT(*) AS total FROM items" },
+    "UsersActive": { "sql": "SELECT id, nazwa as text FROM items WHERE czyAktywny = ?", "sqlCount": "SELECT COUNT(*) AS total FROM items" },
+    "UserByName": { "sql": "SELECT * FROM users WHERE username = ? AND czyAktywny = ?", "tableName": "users" }
+  }
+}
