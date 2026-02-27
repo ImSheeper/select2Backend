@@ -8,69 +8,62 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Started listening on port ${port}...`));
 
 const pool = mysql.createPool({
-  host: 'host.docker.internal',
+  host: 'app-mysql',
   user: 'appuser',
   password: 'apppass',
   database: 'appdb',
+  port: 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-app.get('/api/query/:sqlQuery', async (req, res) => {
-  const page = Math.max(parseInt(req.query.page ?? "1", 10), 1);
-  const limit = Math.min(Math.max(parseInt(req.query.limit ?? "10", 10), 1), 100);
-  const offset = (page - 1) * limit;
-  const term = (req.query.term ?? '').trim();
-
-  const sqlQuery = req.params.sqlQuery;
-
+app.get('/api/query/:sqlQuery', async (req: any, res: any) => {
+  const page: number  = Math.max(parseInt(req.query.page ?? "1", 10), 1);
+  const limit: number = Math.min(Math.max(parseInt(req.query.limit ?? "10", 10), 1), 100);
+  const offset: number = (page - 1) * limit;
+  const search: string = (req.query.search ?? '').trim();
+  const sqlQuery: string = req.params.sqlQuery;
   const sqlGetData = getSentQuery(sqlQuery);
   const sqlCount = sqlGetData['sqlCount'];
   const query = sqlGetData['sql'];
 try {
-  let where = term ? 'WHERE nazwa LIKE ?' : '';
-
-  // Policz ile jest wyników w DB
-  const sqlGetRowsCount = `${sqlCount} ${where}`;
-  const paramsGetRowsCount = term ? [`%${term}%`] : [];
-  const [[{total}]] = await pool.query(sqlGetRowsCount, paramsGetRowsCount); 
+  let where: string = search ? 'WHERE nazwa LIKE ?' : '';
 
   // Testy parametrow
   let stringParameters = [];
   const queryParameters = req.query.queryParameters;
-  console.log(req.query.queryParameters);
+
   if (queryParameters) {
     for (let queryParameter of queryParameters) {
       stringParameters.push(queryParameter);
     }
   }
 
-  console.log('term', term);
-  if (term) {
-    console.log('IFTER');
-    stringParameters.push(`%${term}%`)
+  if (search) {
+    stringParameters.push(`%${search}%`)
   }
 
   // Poprawienie SQL i dodanie parametrow do zapytania
   if (Array.isArray(queryParameters) && queryParameters.length) {
     stringParameters.push(limit, offset) ;
-    where = term ? 'AND nazwa LIKE ?' : '';
+    where = search ? 'AND nazwa LIKE ?' : '';
   } else {
     stringParameters.push(limit, offset);
   }
 
+  // Policz ile jest wyników w DB
+  const sqlGetRowsCount = `${sqlCount} ${where}`;
+  // const paramsGetRowsCount = search ? [`%${search}%`] : [];
+  const [[{total}]] = await pool.query(sqlGetRowsCount, stringParameters); 
+
   // Pobierz dane z DB
-  const sqlGetItems = `${query} ${where} LIMIT ? OFFSET ?`;
+  const sqlGetItems: string = `${query} ${where} LIMIT ? OFFSET ?`;
   const paramsGetItems = stringParameters;
 
-  console.log(`Query: ${sqlGetItems}`);
-  console.log(`Params: ${paramsGetItems}`);
-
   const [results] = await pool.query(sqlGetItems, paramsGetItems);
-  console.log(results);
 
-  const isMorePages = offset + results.length < total;
+  const isMorePages: boolean = offset + results.length < total;
 
   res.json({
     results: results,
@@ -84,7 +77,7 @@ try {
   }
 });
 
-function getSentQuery(id) {
+function getSentQuery(id: string) {
   const file = require('./appsettings.json');
   const queryLocation = file.config.queryLocation
 
