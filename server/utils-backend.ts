@@ -2,6 +2,8 @@ const mysql = require('mysql2/promise');
 const express = require('express');
 const app = express();
 const cors = require("cors");
+const fs = require('fs');
+const path = require('path');
 app.use(cors({ origin: "http://localhost:8080" }));
 
 const port = process.env.PORT || 3000;
@@ -24,7 +26,14 @@ app.get('/api/query/:sqlQuery', async (req: any, res: any) => {
   const offset: number = (page - 1) * limit;
   const search: string = (req.query.search ?? '').trim();
   const sqlQuery: string = req.params.sqlQuery;
+
   const sqlGetData = getSentQuery(sqlQuery);
+  if (!sqlGetData) {
+    res.status(500).json({
+      error: 'Błąd podczas wczytywania pliku. Skontaktuj się z administratorem.'
+    });
+  }
+
   const sqlCount = sqlGetData['sqlCount'];
   const query = sqlGetData['sql'];
 try {
@@ -77,12 +86,17 @@ try {
   }
 });
 
-function getSentQuery(id: string) {
-  const file = require('./appsettings.json');
-  const queryLocation = file.config.queryLocation
+function getSentQuery(id) {
+  try {
+    const appSettingsPath = path.resolve(__dirname, './appsettings.json');
+    const file = JSON.parse(fs.readFileSync(appSettingsPath, 'utf-8'));
 
-  const queriesJSON = require(queryLocation);
-  const querySql = queriesJSON.queries[id]
-  
-  return querySql;
+    const queryPath = path.resolve(__dirname, file.config.queryLocation);
+    const queriesJSON = JSON.parse(fs.readFileSync(queryPath, 'utf-8'));
+
+    return queriesJSON.queries?.[id] ?? null;
+  } catch (err) {
+    console.log('Błąd podczas wczytywania pliku:', err);
+    return null;
+  }
 }

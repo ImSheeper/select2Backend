@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "utils-backend.ts",
   "scripts": {
-    "start": "node server.ts",
-    "dev": "nodemon server.ts",
+    "start": "node utils-backend.ts",
+    "dev": "nodemon --watch . --ext ts --exec \"node utils-backend.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,6 +16,7 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mysql2": "^3.18.2",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2"
   }
 }
