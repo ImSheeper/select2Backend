@@ -1,0 +1,6 @@
+<type>
+    <queries>
+        <mssql>ORDER BY id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY</mssql>
+        <mysql>ORDER BY id LIMIT ?, ?</mysql>
+    </queries>
+</type>
