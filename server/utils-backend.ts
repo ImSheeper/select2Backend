@@ -20,83 +20,82 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-app.get('/api/query/:sqlQuery', async (req: any, res: any) => {
-  const page: number  = Math.max(parseInt(req.query.page ?? "1", 10), 1);
-  const limit: number = Math.min(Math.max(parseInt(req.query.limit ?? "10", 10), 1), 100);
-  const offset: number = (page - 1) * limit;
-  const search: string = (req.query.search ?? '').trim();
-  const sqlQuery: string = req.params.sqlQuery;
+app.get('/api/query/:queryType', async (req: any, res: any) => {
+  const queryType: string = req.params.queryType;
+  const sqlQueries = getSentQuery(queryType);
 
-  const sqlGetData = getSentQuery(sqlQuery);
-  if (!sqlGetData) {
+  if (!sqlQueries) {
     res.status(500).json({
       error: 'Błąd podczas wczytywania pliku. Skontaktuj się z administratorem.'
     });
+    return;
   }
 
-  const sqlCount = sqlGetData['sqlCount'];
-  const query = sqlGetData['sql'];
 try {
-  let where: string = search ? 'WHERE nazwa LIKE ?' : '';
+  let queryParameters: (string | number)[] = []; 
+  const frontendParameters: Array<string> = req.query.queryParameters;
 
-  // Testy parametrow
-  let stringParameters = [];
-  const queryParameters = req.query.queryParameters;
-
-  if (queryParameters) {
-    for (let queryParameter of queryParameters) {
-      stringParameters.push(queryParameter);
+  if (Array.isArray(frontendParameters) && frontendParameters.length) {
+    for (let parameter of frontendParameters) {
+      queryParameters.push(parameter);
     }
   }
+  
+  const search: string = (req.query.term ?? '').trim();
 
   if (search) {
-    stringParameters.push(`%${search}%`)
+    queryParameters.push(`%${search}%`)
   }
 
-  // Poprawienie SQL i dodanie parametrow do zapytania
-  if (Array.isArray(queryParameters) && queryParameters.length) {
-    stringParameters.push(limit, offset) ;
+  const page: number  = Math.max(parseInt(req.query.page ?? "1", 10), 1);
+  const limit: number = Math.min(Math.max(parseInt(req.query.limit ?? "10", 10), 1), 100);
+  const offset: number = (page - 1) * limit;
+  
+  let where: string = search ? 'WHERE nazwa LIKE ?' : '';
+
+  if (Array.isArray(frontendParameters) && frontendParameters.length) {
+    queryParameters.push(limit, offset) ;
     where = search ? 'AND nazwa LIKE ?' : '';
   } else {
-    stringParameters.push(limit, offset);
+    queryParameters.push(limit, offset);
   }
 
   // Policz ile jest wyników w DB
-  const sqlGetRowsCount = `${sqlCount} ${where}`;
-  // const paramsGetRowsCount = search ? [`%${search}%`] : [];
-  const [[{total}]] = await pool.query(sqlGetRowsCount, stringParameters); 
+  const queryCount = sqlQueries['queryCount'];
+  const sqlGetRowsCount = `${queryCount} ${where}`;
+  const [[{rowsCount}]] = await pool.query(sqlGetRowsCount, queryParameters); 
 
   // Pobierz dane z DB
+  const query = sqlQueries['query'];
   const sqlGetItems: string = `${query} ${where} LIMIT ? OFFSET ?`;
-  const paramsGetItems = stringParameters;
+  const [items] = await pool.query(sqlGetItems, queryParameters);
 
-  const [results] = await pool.query(sqlGetItems, paramsGetItems);
-
-  const isMorePages: boolean = offset + results.length < total;
-
+  const isMorePages: boolean = offset + items.length < rowsCount;
+  
   res.json({
-    results: results,
+    results: items,
     pagination: { more: isMorePages }
   });
 } catch (err) {
-    console.error(err);
+    console.error('Wystąpił błąd podczas pobierania danych: ', err);
     res.status(500).json({
-      error: 'An error occured during the data fetching.'
+      error: 'Wystąpił błąd podczas pobierania danych. Skontaktuj się z administratorem.'
     });
+    return;
   }
 });
 
 function getSentQuery(id) {
   try {
-    const appSettingsPath = path.resolve(__dirname, './appsettings.json');
-    const file = JSON.parse(fs.readFileSync(appSettingsPath, 'utf-8'));
+    const appsettingsPath = path.resolve(__dirname, './appsettings.json');
+    const file = JSON.parse(fs.readFileSync(appsettingsPath, 'utf-8'));
 
     const queryPath = path.resolve(__dirname, file.config.queryLocation);
     const queriesJSON = JSON.parse(fs.readFileSync(queryPath, 'utf-8'));
 
     return queriesJSON.queries?.[id] ?? null;
   } catch (err) {
-    console.log('Błąd podczas wczytywania pliku:', err);
+    console.log('Błąd podczas wczytywania pliku: ', err);
     return null;
   }
 }

@@ -1,7 +1,16 @@
 {
   "queries": {
-    "TypKosztu": { "sql": "SELECT id, nazwa as text FROM items", "sqlCount": "SELECT COUNT(*) AS total FROM items" },
-    "UsersActive": { "sql": "SELECT id, nazwa as text FROM items WHERE czyAktywny = ? AND nazwa = ?", "sqlCount": "SELECT COUNT(*) AS total FROM items WHERE czyAktywny = ? AND nazwa = ?" },
-    "UserByName": { "sql": "SELECT * FROM users WHERE username = ? AND czyAktywny = ?", "tableName": "users" }
+    "TypKosztu": { 
+      "query": "SELECT id, nazwa as text FROM items", 
+      "queryCount": "SELECT COUNT(*) AS rowsCount FROM items" 
+    },
+    "UsersActive": { 
+      "query": "SELECT id, nazwa as text FROM items WHERE czyAktywny = ? AND nazwa = ?", 
+      "queryCount": "SELECT COUNT(*) AS rowsCount FROM items WHERE czyAktywny = ? AND nazwa = ?" 
+    },
+    "UserByName": { 
+      "query": "SELECT * FROM users WHERE username = ? AND czyAktywny = ?", 
+      "queryCount": "test" 
+    }
   }
 }
