@@ -1,10 +1,6 @@
-const express = require('express');
-const app = express();
-const cors = require("cors");
-const fs = require('fs');
-const path = require('path');
-const { XMLParser } = require("fast-xml-parser");
-app.use(cors({ origin: "http://localhost:8080" }));
+const app = require('./app.ts');
+const { getSentQuery } = require('./services/getSentQuery.service.ts');
+const { getQueryType } = require('./services/getQueryType.service.ts');
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Started listening on port ${port}...`));
@@ -14,7 +10,7 @@ const pool = require('./config/database.config');
 app.get('/api/query/:queryId', async (req: any, res: any) => {
   const queryId: string = req.params.queryId;
   const sqlQueries = getSentQuery(queryId);
-
+  
   if (!sqlQueries) {
     res.status(500).json({
       error: 'Błąd podczas wczytywania pliku. Skontaktuj się z administratorem.'
@@ -85,64 +81,3 @@ try {
     return;
   }
 });
-
-function getSentQuery(queryId: string) {
-  const appsettings = getAppsettingsContents();
-  if (!appsettings) return;
-
-  try {
-
-    const queryPath = path.resolve(__dirname, appsettings.config.queryLocation);
-    const queriesJSON = JSON.parse(fs.readFileSync(queryPath, 'utf-8'));
-
-    if (!queriesJSON.queries?.[queryId]) {
-      console.error('ERROR: Nieznane zapytanie. Sprawdź queries.json.');
-      return null;
-    }
-
-    return queriesJSON.queries?.[queryId];
-  } catch (err) {
-    console.log('Błąd podczas wczytywania queries.json: ', err);
-    return null;
-  }
-}
-
-function getQueryType() {
-  const appsettings = getAppsettingsContents();
-  if (!appsettings) return;
-
-  try {
-    const xmlPath = path.resolve(__dirname, './databaseType.xml');
-    const xmlFile = fs.readFileSync(xmlPath, 'utf-8');
-
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: '@_'
-    });
-
-    const objectXML = parser.parse(xmlFile);
-    const databaseTypeJSON: string = appsettings?.config?.databaseType;
-    
-    if (!objectXML.type?.queries[databaseTypeJSON]) {
-      console.error('ERROR: Nieobsługiwany typ bazy danych. Sprawdź appsettings.json > databaseType.');
-      return null;
-    }
-
-    return objectXML.type?.queries[databaseTypeJSON];
-  } catch (err) {
-    console.log('Błąd podczas wczytywania pliku databaseType.xml: ', err);
-    return null;
-  }
-}
-
-function getAppsettingsContents() {
-  try {
-    const appsettingsPath = path.resolve(__dirname, './appsettings.json');
-    const file = JSON.parse(fs.readFileSync(appsettingsPath, 'utf-8'));
-
-    return file;
-  } catch (err) {
-    console.log('Błąd podczas wczytywania pliku appsettings.json: ', err);
-    return null;
-  }
-}
