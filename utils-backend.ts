@@ -1,4 +1,3 @@
-const mysql = require('mysql2/promise');
 const express = require('express');
 const app = express();
 const cors = require("cors");
@@ -10,16 +9,7 @@ app.use(cors({ origin: "http://localhost:8080" }));
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Started listening on port ${port}...`));
 
-const pool = mysql.createPool({
-  host: 'app-mysql',
-  user: 'appuser',
-  password: 'apppass',
-  database: 'appdb',
-  port: 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+const pool = require('./config/database.config');
 
 app.get('/api/query/:queryId', async (req: any, res: any) => {
   const queryId: string = req.params.queryId;
@@ -43,7 +33,7 @@ app.get('/api/query/:queryId', async (req: any, res: any) => {
 
 try {
   let queryParameters: (string | number)[] = []; 
-  const frontendParameters: Array<string> = req.query.queryParameters;
+  const frontendParameters: string[] = req.query.queryParameters;
 
   if (Array.isArray(frontendParameters) && frontendParameters.length) {
     for (let parameter of frontendParameters) {
@@ -58,7 +48,7 @@ try {
   }
 
   const page: number  = Math.max(parseInt(req.query.page ?? "1", 10), 1);
-  const limit: number = Math.min(Math.max(parseInt(req.query.limit ?? "10", 10), 1), 100);
+  const limit: number = Math.min(Math.max(parseInt(req.query.limit ?? "100", 10), 1), 1000);
   const offset: number = (page - 1) * limit;
   
   let where: string = search ? 'WHERE nazwa LIKE ?' : '';

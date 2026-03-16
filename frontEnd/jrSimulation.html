@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista z API</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="utils-simulation.js"></script>
+</head>
+<body>
+
+<h1>Wybierz element</h1>
+
+<select class="mySelect" id="TypKosztu" style="width:300px">
+    <option value="">-Typ</option>
+</select>
+
+<select class="mySelect2" id="UsersActive" style="width:300px">
+    <option value="">-Users</option>
+</select>
+
+<script>
+    eSel.dynamicSel({
+        selectClass: '.mySelect', 
+        queryId: 'TypKosztu',
+        delay: 500,
+        limit: 100
+    });
+
+    const queryParams = [1, 'Mysz bezprzewodowa'];
+    eSel.dynamicSel({
+        selectClass: '.mySelect2', 
+        queryId: 'UsersActive'
+        }, queryParams);
+</script>
+
+</body>
+</html>

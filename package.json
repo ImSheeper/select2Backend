@@ -4,7 +4,7 @@
   "main": "utils-backend.ts",
   "scripts": {
     "start": "node utils-backend.ts",
-    "dev": "nodemon --watch . --ext ts --exec \"node utils-backend.ts\"",
+    "dev": "nodemon --watch . --ext ts --exec \"node --env-file=.env utils-backend.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,8 +16,11 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "fast-xml-parser": "^5.4.2",
-    "mysql2": "^3.18.2",
+    "mysql2": "^3.20.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
   }
 }
