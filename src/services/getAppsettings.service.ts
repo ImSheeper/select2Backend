@@ -3,7 +3,7 @@ const path = require('path');
 
 function getAppsettingsContents() {
   try {
-    const appsettingsPath = path.resolve(__dirname, '../config/appsettings.json');
+    const appsettingsPath = path.resolve(__dirname, '../../data/appsettings.json');
     const file = JSON.parse(fs.readFileSync(appsettingsPath, 'utf-8'));
 
     return file;

@@ -1,13 +1,8 @@
-const app = require('./app.ts');
-const { getSentQuery } = require('./services/getSentQuery.service.ts');
-const { getQueryType } = require('./services/getQueryType.service.ts');
+const { getSentQuery } = require('../services/getSentQuery.service.ts');
+const { getQueryType } = require('../services/getQueryType.service.ts');
+const pool = require('../config/database.config.ts');
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Started listening on port ${port}...`));
-
-const pool = require('./config/database.config');
-
-app.get('/api/query/:queryId', async (req: any, res: any) => {
+async function getDataByQueryId(req: any, res: any){
   const queryId: string = req.params.queryId;
   const sqlQueries = getSentQuery(queryId);
   
@@ -80,4 +75,6 @@ try {
     });
     return;
   }
-});
+}
+
+module.exports = { getDataByQueryId }

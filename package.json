@@ -4,7 +4,7 @@
   "main": "utils-backend.ts",
   "scripts": {
     "start": "node utils-backend.ts",
-    "dev": "nodemon --watch . --ext ts --exec \"node --env-file=.env server.ts\"",
+    "dev": "nodemon --watch . --ext ts --exec \"node --env-file=.env src/server.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

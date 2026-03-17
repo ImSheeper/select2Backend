@@ -8,7 +8,7 @@ function getSentQuery(queryId: string) {
   if (!appsettings) return;
 
   try {
-    const queryPath = path.resolve(__dirname, '../' + appsettings.config.queryLocation);
+    const queryPath = path.resolve(__dirname, '../../' + appsettings.config.queryLocation);
     const queriesJSON = JSON.parse(fs.readFileSync(queryPath, 'utf-8'));
 
     if (!queriesJSON.queries?.[queryId]) {

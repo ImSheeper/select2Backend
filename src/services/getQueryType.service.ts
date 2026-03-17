@@ -8,7 +8,7 @@ function getQueryType() {
   if (!appsettings) return;
 
   try {
-    const xmlPath = path.resolve(__dirname, '../config/databaseType.xml');
+    const xmlPath = path.resolve(__dirname, '../../data/databaseType.xml');
     const xmlFile = fs.readFileSync(xmlPath, 'utf-8');
 
     const parser = new XMLParser({
