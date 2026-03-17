@@ -1,8 +1,12 @@
-const { getAppsettingsContents } = require('./getAppsettings.service.ts');
-const fs = require('fs');
-const path = require('path');
+import { getAppsettingsContents } from './getAppsettings.service';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-function getSentQuery(queryId: string) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export function getSentQuery(queryId: string) {
   const appsettings = getAppsettingsContents();
 
   if (!appsettings) return;
@@ -22,5 +26,3 @@ function getSentQuery(queryId: string) {
     return null;
   }
 }
-
-module.exports = { getSentQuery };

@@ -1,9 +1,13 @@
-const { getAppsettingsContents } = require('./getAppsettings.service.ts');
-const { XMLParser } = require("fast-xml-parser");
-const fs = require('fs');
-const path = require('path');
+import { getAppsettingsContents } from './getAppsettings.service';
+import { XMLParser } from "fast-xml-parser";
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-function getQueryType() {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export function getQueryType() {
   const appsettings = getAppsettingsContents();
   if (!appsettings) return;
 
@@ -30,5 +34,3 @@ function getQueryType() {
     return null;
   }
 }
-
-module.exports = { getQueryType };

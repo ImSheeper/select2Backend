@@ -1,8 +1,8 @@
-const { getSentQuery } = require('../services/getSentQuery.service.ts');
-const { getQueryType } = require('../services/getQueryType.service.ts');
-const pool = require('../config/database.config.ts');
+import { getSentQuery } from '../services/getSentQuery.service';
+import { getQueryType } from '../services/getQueryType.service';
+import pool from '../config/database.config';
 
-async function getDataByQueryId(req: any, res: any){
+async function getDataByQueryId(req: any, res: any){ // 'any' tymczasowo
   const queryId: string = req.params.queryId;
   const sqlQueries = getSentQuery(queryId);
   
@@ -54,13 +54,13 @@ try {
   // Policz ile jest wyników w DB
   const queryCount = sqlQueries['queryCount'];
   const sqlGetRowsCount = `${queryCount} ${where}`;
-  const [[{rowsCount}]] = await pool.query(sqlGetRowsCount, queryParameters); 
+  const [[{rowsCount}]]: any = await pool.query(sqlGetRowsCount, queryParameters); // 'any' tymczasowo, nie umiem jeszcze w typy baz
 
   // Pobierz dane z DB
   const query = sqlQueries['query'];
   const sqlGetItems: string = `${query} ${where} ${queryString}`;
   console.log(`Query: ${sqlGetItems}`);
-  const [items] = await pool.query(sqlGetItems, queryParameters);
+  const [items]: any = await pool.query(sqlGetItems, queryParameters); // 'any' tymczasowo, nie umiem jeszcze w typy baz
 
   const isMorePages: boolean = offset + items.length < rowsCount;
   
@@ -77,4 +77,4 @@ try {
   }
 }
 
-module.exports = { getDataByQueryId }
+export default { getDataByQueryId }

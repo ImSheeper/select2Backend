@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const queryController = require('../controllers/queryController.ts');
+import queryController from '../controllers/query.controller';
 
 // get data from DB dynamically
 router.get('/api/query/:queryId', queryController.getDataByQueryId);
 
-module.exports = router;
+export default router;

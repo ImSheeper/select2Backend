@@ -1,5 +1,5 @@
-const app = require('./app.ts');
-const queryRoutes = require('./routes/queryRoutes.ts');
+import app from './app';
+import queryRoutes from './routes/query.routes';
 const port = process.env.PORT || 3000;
 
 // Route - get data from DB dynamically

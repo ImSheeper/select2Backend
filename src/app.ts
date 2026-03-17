@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const cors = require("cors");
+import cors from "cors";
 
 app.use(cors({ origin: "http://localhost:8080" }));
 
-module.exports = app;
+export default app;

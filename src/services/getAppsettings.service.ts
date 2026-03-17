@@ -1,7 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-function getAppsettingsContents() {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export function getAppsettingsContents() {
   try {
     const appsettingsPath = path.resolve(__dirname, '../../data/appsettings.json');
     const file = JSON.parse(fs.readFileSync(appsettingsPath, 'utf-8'));
@@ -12,5 +16,3 @@ function getAppsettingsContents() {
     return null;
   }
 }
-
-module.exports = { getAppsettingsContents };
