@@ -54,6 +54,7 @@ class ESel {
                 },
                 processResults: function (data, params) {
                     params.page = params.page || 1;
+                    
                     return data;
                 },
                 error: function (err) {
