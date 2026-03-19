@@ -22,7 +22,7 @@ export function getSentQuery(queryId: string) {
 
     return queriesJSON.queries?.[queryId];
   } catch (err) {
-    console.log('Błąd podczas wczytywania queries.json: ', err);
+    throw new Error('Błąd podczas wczytywania queries.json: ', { cause: err });
     return null;
   }
 }
